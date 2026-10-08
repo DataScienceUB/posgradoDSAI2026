@@ -1,0 +1,9 @@
+--- a/analysis.py
++++ b/analysis.py
+@@ -1,4 +1,5 @@
+ import pandas as pd
+ 
+ df = pd.read_csv("readings.csv")
+-print("Mean temperature:", df["temperature_c"].mean())
++print("Mean temperature:", df["temp_avg"].mean())
++print("Hottest day:", df.loc[df["temp_avg"].idxmax(), "date"])

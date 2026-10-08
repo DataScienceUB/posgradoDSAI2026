@@ -218,3 +218,8 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Course-specific
+.DS_Store
+.ipynb_checkpoints/
+**/instructor/
