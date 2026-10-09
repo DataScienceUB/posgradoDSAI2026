@@ -23,6 +23,8 @@ A short, step-by-step guide to prepare your laptop: accounts, installation, and 
 | [Notebook: the hidden-state trap](notebooks/01_hidden_state.ipynb) | Why you must *Restart and Run All* |
 | [Demos: simulated AI changes](demo/ai_diffs/README.md) | Four typical assistant mistakes, as diffs you can read |
 | [Demo: notebooks in Git](demo/notebook_git/README.md) | Why notebooks are awkward in Git |
+| [Git and GitHub: forks and keeping in sync](guides/git_forks_and_sync.md) | How to organize your folders, and an advanced example with forks |
+| [Files of a project that uses AI assistants](guides/ai_project_files.md) · [templates](templates/ai_project/README.md) | `AGENTS.md`, `TASKS.md`, `ARCHITECTURE.md`, `SPECS.md`, `DESIGN.md` explained, with small templates |
 
 ## Folder map
 ```
@@ -31,5 +33,6 @@ Session_02/
 ├── exercises/   the lab
 ├── guides/      short guides
 ├── notebooks/   class notebooks
+├── templates/   starter files (AI project files)
 └── demo/        demos used in class
 ```

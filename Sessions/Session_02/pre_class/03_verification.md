@@ -40,7 +40,7 @@ postgrau-env/
 
 ## 3.2 Get the check notebook
 1. Open the course repository <https://github.com/DataScienceUB/posgradoDSAI2026> in your browser (signed in to GitHub).
-2. Go to `Session_02/pre_class/` and click **`verify_setup.ipynb`**.
+2. Go to `Sessions/Session_02/pre_class/` and click **`verify_setup.ipynb`**.
 3. Click **Download raw file** (the icon with a down arrow, top right of the file view).
 4. Move the downloaded file **into your `postgrau-env` folder**.
 

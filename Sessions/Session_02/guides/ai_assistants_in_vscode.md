@@ -20,7 +20,7 @@ You installed two extensions in the pre-class guide:
 * Ask it to **explain** its code, and explain it to someone else. If you cannot explain it, do not commit it.
 * Keep an `AI_LOG.md`: what you asked, what failed, what you fixed.
 
-## What to watch for (simulated examples in `Session_02/demo/ai_diffs/`)
+## What to watch for (simulated examples in `Sessions/Session_02/demo/ai_diffs/`)
 1. Invented names (columns, functions).
 2. Obsolete functions from old tutorials.
 3. Silent errors (a join that duplicates rows).
