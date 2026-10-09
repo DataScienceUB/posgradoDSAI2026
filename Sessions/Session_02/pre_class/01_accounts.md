@@ -19,7 +19,7 @@ Copilot is one of the AI assistants we will use. It is **free for verified stude
 > Verification can take **a few days**: start it early. If it is not ready for the class, do not worry: you can still follow the session.
 
 ## 1.3 Access to the course repository
-The course repository is <https://github.com/DataScienceUB/posgradoDSAI2026>. Depending on how we configure it, you may need to be **invited** to see it. If GitHub says *"repository not found"*, check that you are signed in with the account the instructors gave access to.
+The course repository is <https://github.com/DataScienceUB/posgradoDSAI2026>. At the beginning it is **public**, so everybody can open it and fork it. Later we will create a **group for the students** and access will be restricted to that group: we will tell you how to join it. If GitHub says *"repository not found"* later, check that you are signed in with the account that is in the group.
 
 ## 1.4 Claude (later)
 We will also use **Claude** inside VS Code. **We will give you the credentials later**, and we will set it up together. For now you only need to install the extension (Part 2). If you already have access to Claude and want to try it, go ahead, but it is not required.

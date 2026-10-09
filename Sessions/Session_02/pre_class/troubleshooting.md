@@ -13,7 +13,7 @@
 | VS Code asks to install "ipykernel" | Click *Install*, or run `uv add --dev ipykernel` in the terminal. |
 | The kernel still does not work in VS Code | Use [**Plan B: JupyterLab**](#plan-b-jupyterlab-in-your-browser) below. |
 | First commit fails: *"configure your user.name and user.email"* | Run the two `git config` commands of [2.3](02_installation.md#23-git). |
-| GitHub says "repository not found" for the course repository | Check that you are signed in with the account the instructors gave access to ([1.3](01_accounts.md#13-access-to-the-course-repository)). |
+| GitHub says "repository not found" for the course repository | The repository is public at the beginning; once access is restricted, check that you are signed in with the account that belongs to the student group ([1.3](01_accounts.md#13-access-to-the-course-repository)). |
 | Anything else | Take a screenshot of the error and bring it to the class. |
 
 ## Plan B: JupyterLab in your browser

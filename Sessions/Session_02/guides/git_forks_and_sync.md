@@ -74,7 +74,7 @@ Now B's fork has `notes_A2.md` **and** `notes_B.md`: the original's changes arri
 
 ## 3 · The other option: work inside a fork of the course repository
 
-Instead of two folders, you can **fork the course repository** and work directly in your fork (if the repository settings allow forking; the instructors will tell you):
+Instead of two folders, you can **fork the course repository** and work directly in your fork. The full step-by-step guide, with a diagram and screenshots, is [**Part 5 of the preparation guide**](../pre_class/05_fork_course_repo.md). In short:
 
 1. On the course repository page, click **Fork** → *Create fork*. You now have `your-username/posgradoDSAI2026`.
 2. **Clone your fork** to your laptop (this is the only folder you need): GitHub Desktop *File → Clone repository…*, or VS Code *Git: Clone*.

@@ -10,7 +10,7 @@ When you finish you will have:
 * A **GitHub account**, and the **AI assistants** (GitHub Copilot and Claude Code) installed in VS Code.
 * A project folder and a **notebook where every check shows ✅**. A screenshot of it is your ticket for the *traffic light* at the start of the class.
 
-## The guide is split in four short parts
+## The guide is split in short parts
 
 | # | Part | What you do | Time |
 |---|---|---|---|
@@ -18,6 +18,7 @@ When you finish you will have:
 | 2 | [**Installation**](02_installation.md) | Install VS Code, `uv`, Git, GitHub Desktop and the VS Code extensions | 20 min |
 | 3 | [**Verification**](03_verification.md) | Create your project, run the check notebook and take the screenshot (**the required exercise**) | 15 min |
 | 4 | [**Optional: your first repository**](04_git_exercise.md) | Create a repository and clone it, to check your GitHub credentials | 10 min |
+| 5 | [**Fork the course repository**](05_fork_course_repo.md) | Make your own copy of the course repository and learn to keep it up to date (we do it in class if you have not) | 15 min |
 
 Also useful: [Command cheat sheet](cheatsheet.md) · [Troubleshooting](troubleshooting.md) (with a Plan B if notebooks do not run in VS Code).
 

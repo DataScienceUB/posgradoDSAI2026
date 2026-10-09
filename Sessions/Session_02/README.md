@@ -13,6 +13,7 @@ A short, step-by-step guide to prepare your laptop: accounts, installation, and 
 | [2 · Installation](pre_class/02_installation.md) | VS Code, `uv`, Git, GitHub Desktop, extensions |
 | [3 · Verification](pre_class/03_verification.md) | Create your project and run the check notebook (**required**) |
 | [4 · Your first repository](pre_class/04_git_exercise.md) | Optional: create and clone a repository |
+| [5 · Fork the course repository](pre_class/05_fork_course_repo.md) | Your own copy of the course repository, and how to keep it up to date (done in class if not before) |
 | [Cheat sheet](pre_class/cheatsheet.md) · [Troubleshooting](pre_class/troubleshooting.md) | Commands and Plan B |
 
 ## B · In the class
