@@ -1,0 +1,20 @@
+[project]
+name = "temperatures"
+version = "0.1.0"
+description = "Clean the raw temperature file of three stations and plot it (example of an AI-assisted project)"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "matplotlib>=3.8",
+    "pandas>=2.2",
+]
+
+[dependency-groups]
+dev = [
+    "ipykernel>=6.29",
+    "pytest>=8.0",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

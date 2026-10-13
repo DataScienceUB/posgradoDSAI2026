@@ -26,6 +26,7 @@ A short, step-by-step guide to prepare your laptop: accounts, installation, and 
 | [Demo: notebooks in Git](demo/notebook_git/README.md) | Why notebooks are awkward in Git |
 | [Git and GitHub: forks and keeping in sync](guides/git_forks_and_sync.md) | How to organize your folders, and an advanced example with forks |
 | [Files of a project that uses AI assistants](guides/ai_project_files.md) · [templates](templates/ai_project/README.md) | `AGENTS.md`, `TASKS.md`, `ARCHITECTURE.md`, `SPECS.md`, `DESIGN.md` explained, with small templates |
+| [Example project: temperatures](examples/temperatures/README.md) | A small project with those files filled in; the code is written by you **with the assistant**, using the context |
 
 ## Folder map
 ```
@@ -35,5 +36,6 @@ Session_02/
 ├── guides/      short guides
 ├── notebooks/   class notebooks
 ├── templates/   starter files (AI project files)
+├── examples/    a worked example that uses them
 └── demo/        demos used in class
 ```

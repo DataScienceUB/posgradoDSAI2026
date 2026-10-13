@@ -20,4 +20,6 @@ my-project/
 └── tests/             tests (pytest)
 ```
 
+See them filled in, in a small finished project: [`examples/temperatures/`](../../examples/temperatures/README.md).
+
 You do **not** need all of them in every project. Start with `AGENTS.md` and `TASKS.md`; add the others when the project grows.

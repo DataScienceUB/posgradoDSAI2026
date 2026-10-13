@@ -34,3 +34,5 @@ my-project/
 **Which assistant reads what?** `AGENTS.md` is read by many tools (GitHub Copilot, among others); Claude Code reads `CLAUDE.md`, so a one-line `CLAUDE.md` containing `@AGENTS.md` points it to the same instructions. Interfaces change quickly: check the docs ([Claude Code memory](https://code.claude.com/docs/en/memory) · [Copilot repository instructions](https://docs.github.com/en/copilot/how-tos/configure-custom-instructions/add-repository-instructions)).
 
 👉 A small starter with all of these files, commented and with a tiny example: [`templates/ai_project/`](../templates/ai_project/README.md).
+
+👉 An **example project** with the files filled in (the temperature problem): [`examples/temperatures/`](../examples/temperatures/README.md). The code is **not** written: give the assistant the context and ask it to do task 2. Read `AGENTS.md` and `TASKS.md` first.
