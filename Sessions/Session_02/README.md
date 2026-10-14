@@ -19,6 +19,7 @@ A short, step-by-step guide to prepare your laptop: accounts, installation, and 
 ## B · In the class
 | Resource | What it is |
 |---|---|
+| [Slides (PDF)](Session_02.pdf) | The presentation of the session |
 | [Lab: clean the temperature data](exercises/lab/README.md) | Pairs, with your AI assistant: write a cleaning function and its tests |
 | [AI assistants in VS Code](guides/ai_assistants_in_vscode.md) | Quick guide: Copilot and Claude, good habits, what to watch for |
 | [Notebook: the hidden-state trap](notebooks/01_hidden_state.ipynb) | Why you must *Restart and Run All* |
@@ -31,7 +32,8 @@ A short, step-by-step guide to prepare your laptop: accounts, installation, and 
 ## Folder map
 ```
 Session_02/
-├── pre_class/   preparation guide (4 parts) and the check notebook
+├── Session_02.pdf   the slides
+├── pre_class/   preparation guide and the check notebook
 ├── exercises/   the lab
 ├── guides/      short guides
 ├── notebooks/   class notebooks
