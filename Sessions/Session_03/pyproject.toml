@@ -1,0 +1,19 @@
+[project]
+name = "etl-class-notebook"
+version = "0.1.0"
+description = "2-hour hands-on ETL class with Eurostat data (Jupyter notebook)"
+requires-python = ">=3.10"
+dependencies = [
+    "pandas>=2.1",
+    "polars>=1.0",
+    "matplotlib>=3.8",
+    "pyarrow>=15",
+    "jupyterlab>=4",
+    "ipykernel>=6",
+    "notebook-intelligence>=6.2.0",
+    "duckdb>=1.1",
+]
+
+[dependency-groups]
+# Only needed by the instructor to rebuild/test the notebooks:  uv sync --group instructor
+instructor = ["nbformat>=5", "nbclient>=0.10"]

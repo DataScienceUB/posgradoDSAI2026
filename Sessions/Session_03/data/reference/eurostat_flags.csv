@@ -1,0 +1,8 @@
+flag,meaning
+:,not available
+b,break in time series
+d,definition differs (see metadata)
+e,estimated
+p,provisional
+u,low reliability
+dp,"definition differs (see metadata), provisional"

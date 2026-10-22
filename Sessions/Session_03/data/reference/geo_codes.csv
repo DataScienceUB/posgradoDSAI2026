@@ -1,0 +1,38 @@
+geo,country,is_aggregate
+AT,Austria,false
+BA,Bosnia and Herzegovina,false
+BE,Belgium,false
+BG,Bulgaria,false
+CH,Switzerland,false
+CY,Cyprus,false
+CZ,Czechia,false
+DE,Germany,false
+DK,Denmark,false
+EE,Estonia,false
+EL,Greece,false
+ES,Spain,false
+EU27_2020,European Union - 27 countries (from 2020),true
+EU28,European Union - 28 countries (2013-2020),true
+FI,Finland,false
+FR,France,false
+HR,Croatia,false
+HU,Hungary,false
+IE,Ireland,false
+IS,Iceland,false
+IT,Italy,false
+LI,Liechtenstein,false
+LT,Lithuania,false
+LU,Luxembourg,false
+LV,Latvia,false
+MT,Malta,false
+NL,Netherlands,false
+NO,Norway,false
+PL,Poland,false
+PT,Portugal,false
+RO,Romania,false
+RS,Serbia,false
+SE,Sweden,false
+SI,Slovenia,false
+SK,Slovakia,false
+TR,Türkiye,false
+UK,United Kingdom,false

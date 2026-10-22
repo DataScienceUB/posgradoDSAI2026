@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>¿Qué es ETL? (versión notebook)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400..700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+<style>
+html, body { margin: 0; background: #0D1219; }
+.deck section { position: relative; width: 1920px; height: 1080px; box-sizing: border-box; overflow: hidden; }
+.deck section * { margin: 0; box-sizing: border-box; }
+.deck table { border-collapse: collapse; width: 100%; }
+.deck th, .deck td { text-align: left; padding: 14px 16px; border-bottom: 1px solid rgba(128, 128, 128, 0.35); }
+.deck th { font-weight: 600; }
+.deck .arrow-right { flex: none; clip-path: polygon(0 30%, 60% 30%, 60% 0, 100% 50%, 60% 100%, 60% 70%, 0 70%); }
+.deck section aside { display: none; }
+#notes { display: none; }
+
+@media screen {
+  body { overflow: hidden; }
+  .deck { position: absolute; left: 50%; top: 50%; width: 1920px; height: 1080px; transform-origin: center; }
+  .deck section:not(.active) { display: none !important; }
+  body.show-notes #notes { display: block; position: fixed; left: 0; right: 0; bottom: 0; height: 22vh;
+    overflow: auto; padding: 12px 24px; background: #F6F4EE; color: #16202E;
+    font: 18px/1.45 'IBM Plex Sans', Arial, sans-serif; border-top: 4px solid #B4432B; }
+  #counter { position: fixed; right: 16px; top: 10px; color: #8E9AAB; font: 14px 'IBM Plex Sans', Arial, sans-serif; }
+}
+@media print {
+  @page { size: 1920px 1080px; margin: 0; }
+  html, body { background: none; }
+  .deck { position: static !important; transform: none !important; }  /* undo the on-screen scaling */
+  .deck section { break-after: page; }
+  #counter, #notes { display: none !important; }
+}
+</style>
+</head>
+<body>
+<div class="deck">
+<section id="cover" data-transition="fade" style="background:#16202E;color:#F6F4EE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;justify-content:center;gap:40px">
+<p style="font-size:28px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F0937B">Clase práctica de 2 horas · ETL con datos de Eurostat</p>
+<h1 style="font-family:'EB Garamond', Georgia, serif;font-size:128px;font-weight:500;line-height:1.05;color:#F6F4EE">ETL: de datos crudos a datos útiles</h1>
+<p style="font-size:44px;color:#6CC3C9;font-weight:500">Extract · Transform · Load</p>
+</section>
+<section id="dirty" data-transition="fade" style="background:#F6F4EE;color:#16202E;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<p style="font-size:26px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B4432B">El problema</p>
+<h2 style="font-family:'EB Garamond', Georgia, serif;font-size:76px;font-weight:500;line-height:1.1;color:#16202E">Los datos reales no llegan limpios</h2>
+<div style="display:flex;flex-direction:row;gap:64px;align-items:center">
+<div style="width:860px;display:flex;flex-direction:column;gap:16px">
+<table style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:34px;color:#16202E">
+<tr><th style="width:31%">geo</th><th style="width:23%">2019</th><th style="width:23%">2020</th><th style="width:23%">2021</th></tr>
+<tr><td>BE</td><td>6.21</td><td>6.71 p</td><td>6.26</td></tr>
+<tr><td>EL</td><td>3.59 p</td><td>:</td><td>:</td></tr>
+<tr><td>EU27_2020</td><td>4.70 d</td><td>5.02 d</td><td>4.86 d</td></tr>
+</table>
+<p style="font-size:24px;color:#5A626B">Fragmento real del archivo de Eurostat educ_uoe_fine06 (gasto público en educación, % del PIB)</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:28px">
+<p style="font-size:34px;line-height:1.35"><b>:</b> significa «no disponible», no cero.</p>
+<p style="font-size:34px;line-height:1.35"><b>p, d</b> son notas sobre la calidad del dato, pegadas al número.</p>
+<p style="font-size:34px;line-height:1.35"><b>EU27_2020</b> no es un país, es un agregado.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1000px;font-size:24px;color:#5A626B">¿Qué es ETL?</p>
+<p style="position:absolute;left:1664px;bottom:64px;width:128px;font-size:24px;color:#5A626B;text-align:right">2</p>
+</section>
+<section id="phases" data-transition="fade" style="background:#F6F4EE;color:#16202E;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<p style="font-size:26px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B4432B">La solución</p>
+<h2 style="font-family:'EB Garamond', Georgia, serif;font-size:76px;font-weight:500;line-height:1.1;color:#16202E">ETL tiene tres fases</h2>
+<div style="display:flex;flex-direction:row;gap:32px;align-items:center">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FCFBF7;padding:40px;border:1px solid #E2DED3;border-radius:16px">
+<p style="font-family:'EB Garamond', Georgia, serif;font-size:120px;font-weight:500;line-height:1;color:#B4432B">E</p>
+<h3 style="font-size:40px;font-weight:600">Extract</h3>
+<p style="font-size:30px;line-height:1.35;color:#3D4654">Extraer los datos de la fuente.</p>
+<p style="font-size:28px;line-height:1.35;color:#5A626B;font-style:italic">Comprar los ingredientes</p>
+</div>
+<div class="arrow-right" style="width:80px;height:48px;background:#1F6F76"></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FCFBF7;padding:40px;border:1px solid #E2DED3;border-radius:16px">
+<p style="font-family:'EB Garamond', Georgia, serif;font-size:120px;font-weight:500;line-height:1;color:#B4432B">T</p>
+<h3 style="font-size:40px;font-weight:600">Transform</h3>
+<p style="font-size:30px;line-height:1.35;color:#3D4654">Limpiar y reorganizar los datos.</p>
+<p style="font-size:28px;line-height:1.35;color:#5A626B;font-style:italic">Cocinar</p>
+</div>
+<div class="arrow-right" style="width:80px;height:48px;background:#1F6F76"></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FCFBF7;padding:40px;border:1px solid #E2DED3;border-radius:16px">
+<p style="font-family:'EB Garamond', Georgia, serif;font-size:120px;font-weight:500;line-height:1;color:#B4432B">L</p>
+<h3 style="font-size:40px;font-weight:600">Load</h3>
+<p style="font-size:30px;line-height:1.35;color:#3D4654">Dejar el resultado donde se pueda usar.</p>
+<p style="font-size:28px;line-height:1.35;color:#5A626B;font-style:italic">Servir el plato</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1000px;font-size:24px;color:#5A626B">¿Qué es ETL?</p>
+<p style="position:absolute;left:1664px;bottom:64px;width:128px;font-size:24px;color:#5A626B;text-align:right">3</p>
+</section>
+<section id="extract" data-transition="fade" style="background:#F6F4EE;color:#16202E;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<p style="font-size:26px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B4432B">Fase 1 · Extract</p>
+<h2 style="font-family:'EB Garamond', Georgia, serif;font-size:76px;font-weight:500;line-height:1.1;color:#16202E">Los datos vienen de muchos sitios</h2>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:32px">
+<div style="display:flex;flex-direction:row;gap:24px;align-items:center;background:#FCFBF7;padding:32px;border:1px solid #E2DED3;border-radius:16px">
+<svg viewBox="0 0 24 24" style="color:#1F6F76;width:56px;height:56px;flex:none" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+<p style="font-size:32px;font-weight:500">Archivos CSV y TSV</p>
+</div>
+<div style="display:flex;flex-direction:row;gap:24px;align-items:center;background:#FCFBF7;padding:32px;border:1px solid #E2DED3;border-radius:16px">
+<svg viewBox="0 0 24 24" style="color:#1F6F76;width:56px;height:56px;flex:none" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+<p style="font-size:32px;font-weight:500">JSON y XML</p>
+</div>
+<div style="display:flex;flex-direction:row;gap:24px;align-items:center;background:#FCFBF7;padding:32px;border:1px solid #E2DED3;border-radius:16px">
+<svg viewBox="0 0 24 24" style="color:#1F6F76;width:56px;height:56px;flex:none" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+<p style="font-size:32px;font-weight:500">Hojas de Excel</p>
+</div>
+<div style="display:flex;flex-direction:row;gap:24px;align-items:center;background:#FCFBF7;padding:32px;border:1px solid #E2DED3;border-radius:16px">
+<svg viewBox="0 0 24 24" style="color:#1F6F76;width:56px;height:56px;flex:none" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+<p style="font-size:32px;font-weight:500">Bases de datos</p>
+</div>
+<div style="display:flex;flex-direction:row;gap:24px;align-items:center;background:#FCFBF7;padding:32px;border:1px solid #E2DED3;border-radius:16px">
+<svg viewBox="0 0 24 24" style="color:#1F6F76;width:56px;height:56px;flex:none" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+<p style="font-size:32px;font-weight:500">APIs web</p>
+</div>
+<div style="display:flex;flex-direction:row;gap:24px;align-items:center;background:#FCFBF7;padding:32px;border:1px solid #E2DED3;border-radius:16px">
+<svg viewBox="0 0 24 24" style="color:#1F6F76;width:56px;height:56px;flex:none" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+<p style="font-size:32px;font-weight:500">Páginas web</p>
+</div>
+</div>
+<p style="font-size:34px;line-height:1.35;color:#3D4654"><b style="color:#B4432B">Hoy:</b> un archivo TSV de Eurostat, que leerás como una tabla con Python.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1000px;font-size:24px;color:#5A626B">¿Qué es ETL?</p>
+<p style="position:absolute;left:1664px;bottom:64px;width:128px;font-size:24px;color:#5A626B;text-align:right">4</p>
+</section>
+<section id="transform" data-transition="fade" style="background:#F6F4EE;color:#16202E;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<p style="font-size:26px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B4432B">Fase 2 · Transform</p>
+<h2 style="font-family:'EB Garamond', Georgia, serif;font-size:76px;font-weight:500;line-height:1.1;color:#16202E">Aquí están las decisiones</h2>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px;background:#FCFBF7;padding:32px;border:1px solid #E2DED3;border-radius:16px">
+<h3 style="font-size:34px;font-weight:600">Convertir valores</h3>
+<p style="font-size:28px;line-height:1.35;color:#3D4654">De texto a número, separar el flag.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FCFBF7;padding:32px;border:1px solid #E2DED3;border-radius:16px">
+<h3 style="font-size:34px;font-weight:600">Valores ausentes</h3>
+<p style="font-size:28px;line-height:1.35;color:#3D4654">Dejarlos, eliminarlos o rellenarlos.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FCFBF7;padding:32px;border:1px solid #E2DED3;border-radius:16px">
+<h3 style="font-size:34px;font-weight:600">Seleccionar</h3>
+<p style="font-size:28px;line-height:1.35;color:#3D4654">Quedarse con los países y años de interés.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FCFBF7;padding:32px;border:1px solid #E2DED3;border-radius:16px">
+<h3 style="font-size:34px;font-weight:600">Unir tablas</h3>
+<p style="font-size:28px;line-height:1.35;color:#3D4654">Añadir el nombre del país a partir de su código.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FCFBF7;padding:32px;border:1px solid #E2DED3;border-radius:16px">
+<h3 style="font-size:34px;font-weight:600">Agregar</h3>
+<p style="font-size:28px;line-height:1.35;color:#3D4654">Medias por país, sumas por año.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FCFBF7;padding:32px;border:1px solid #E2DED3;border-radius:16px">
+<h3 style="font-size:34px;font-weight:600">Ordenar y clasificar</h3>
+<p style="font-size:28px;line-height:1.35;color:#3D4654">Quién es el primero y quién el último.</p>
+</div>
+</div>
+<p style="font-size:36px;line-height:1.3;font-style:italic;color:#B4432B">Cada transformación es una decisión, y cambia el resultado.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1000px;font-size:24px;color:#5A626B">¿Qué es ETL?</p>
+<p style="position:absolute;left:1664px;bottom:64px;width:128px;font-size:24px;color:#5A626B;text-align:right">5</p>
+</section>
+<section id="load" data-transition="fade" style="background:#F6F4EE;color:#16202E;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<p style="font-size:26px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B4432B">Fase 3 · Load</p>
+<h2 style="font-family:'EB Garamond', Georgia, serif;font-size:76px;font-weight:500;line-height:1.1;color:#16202E">El resultado debe ir a un lugar útil</h2>
+<div style="display:flex;flex-direction:row;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FCFBF7;padding:32px;border:1px solid #E2DED3;border-radius:16px">
+<h3 style="font-size:38px;font-weight:600">CSV</h3>
+<p style="font-size:28px;line-height:1.35;color:#3D4654">Universal y legible por todos.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FCFBF7;padding:32px;border:1px solid #E2DED3;border-radius:16px">
+<h3 style="font-size:38px;font-weight:600">Parquet</h3>
+<p style="font-size:28px;line-height:1.35;color:#3D4654">Compacto y conserva los tipos.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FCFBF7;padding:32px;border:1px solid #E2DED3;border-radius:16px">
+<h3 style="font-size:38px;font-weight:600">Base de datos</h3>
+<p style="font-size:28px;line-height:1.35;color:#3D4654">Se puede consultar y compartir.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FCFBF7;padding:32px;border:1px solid #E2DED3;border-radius:16px">
+<h3 style="font-size:38px;font-weight:600">Gráficos</h3>
+<p style="font-size:28px;line-height:1.35;color:#3D4654">Para comunicar el resultado.</p>
+</div>
+</div>
+<p style="font-size:36px;line-height:1.3;font-style:italic;color:#B4432B">Si otra persona puede repetir el proceso, el resultado es fiable.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1000px;font-size:24px;color:#5A626B">¿Qué es ETL?</p>
+<p style="position:absolute;left:1664px;bottom:64px;width:128px;font-size:24px;color:#5A626B;text-align:right">6</p>
+</section>
+<section id="loadtypes" data-transition="fade" style="background:#F6F4EE;color:#16202E;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:26px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B4432B">Fase 3 · Load</p>
+<h2 style="font-family:'EB Garamond', Georgia, serif;font-size:76px;font-weight:500;line-height:1.1;color:#16202E">Muchos lugares donde cargar el resultado</h2>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:24px">
+<div style="display:flex;flex-direction:column;gap:10px;background:#FCFBF7;padding:28px;border:2px solid #1F6F76;border-radius:16px">
+<h3 style="font-size:32px;font-weight:600">Archivos</h3>
+<p style="font-size:24px;line-height:1.35;color:#3D4654">CSV, Parquet, JSON, Excel</p>
+<p style="font-size:20px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B4432B">Hoy: CSV, Parquet, JSON</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FCFBF7;padding:28px;border:2px solid #1F6F76;border-radius:16px">
+<h3 style="font-size:32px;font-weight:600">Base de datos relacional</h3>
+<p style="font-size:24px;line-height:1.35;color:#3D4654">SQLite, PostgreSQL, MySQL</p>
+<p style="font-size:20px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B4432B">Hoy: SQLite</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FCFBF7;padding:28px;border:2px solid #1F6F76;border-radius:16px">
+<h3 style="font-size:32px;font-weight:600">Base de datos analítica</h3>
+<p style="font-size:24px;line-height:1.35;color:#3D4654">DuckDB, BigQuery, Snowflake</p>
+<p style="font-size:20px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B4432B">Hoy: DuckDB</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FCFBF7;padding:28px;border:2px solid #1F6F76;border-radius:16px">
+<h3 style="font-size:32px;font-weight:600">Base de datos documental (NoSQL)</h3>
+<p style="font-size:24px;line-height:1.35;color:#3D4654">MongoDB, CouchDB, Firestore</p>
+<p style="font-size:20px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B4432B">Hoy: documentos JSON</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#F6F4EE;padding:28px;border:1px dashed #C9C3B4;border-radius:16px">
+<h3 style="font-size:32px;font-weight:600">Data lake</h3>
+<p style="font-size:24px;line-height:1.35;color:#3D4654">Archivos Parquet en la nube (S3, Azure)</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#F6F4EE;padding:28px;border:1px dashed #C9C3B4;border-radius:16px">
+<h3 style="font-size:32px;font-weight:600">Clave-valor</h3>
+<p style="font-size:24px;line-height:1.35;color:#3D4654">Redis, DynamoDB: búsquedas rápidas por clave</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#F6F4EE;padding:28px;border:1px dashed #C9C3B4;border-radius:16px">
+<h3 style="font-size:32px;font-weight:600">Motor de búsqueda</h3>
+<p style="font-size:24px;line-height:1.35;color:#3D4654">Elasticsearch, OpenSearch: búsqueda de texto</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FCFBF7;padding:28px;border:2px solid #1F6F76;border-radius:16px">
+<h3 style="font-size:32px;font-weight:600">Cuadros de mando e informes</h3>
+<p style="font-size:24px;line-height:1.35;color:#3D4654">Gráficos, Power BI, Tableau, una web</p>
+<p style="font-size:20px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B4432B">Hoy: gráficos</p>
+</div>
+</div>
+<p style="font-size:30px;line-height:1.3;font-style:italic;color:#3D4654">Y muchos más: bases de datos de grafos (Neo4j), series temporales (InfluxDB), bases de datos vectoriales para IA…</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1000px;font-size:24px;color:#5A626B">¿Qué es ETL?</p>
+<p style="position:absolute;left:1664px;bottom:64px;width:128px;font-size:24px;color:#5A626B;text-align:right">7</p>
+</section>
+<section id="example" data-transition="fade" style="background:#F6F4EE;color:#16202E;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<p style="font-size:26px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B4432B">Un ejemplo</p>
+<h2 style="font-family:'EB Garamond', Georgia, serif;font-size:76px;font-weight:500;line-height:1.1;color:#16202E">Una celda, cinco columnas</h2>
+<div style="display:flex;flex-direction:row;gap:32px;align-items:center">
+<div style="width:520px;display:flex;flex-direction:column;gap:16px;background:#16202E;padding:40px;border-radius:16px">
+<p style="font-size:26px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#F0937B">Antes (crudo)</p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:88px;line-height:1.1;color:#F6F4EE">6.71 p</p>
+<p style="font-size:28px;line-height:1.35;color:#C5CEDA">Un número y una nota, dentro de un solo texto.</p>
+</div>
+<div class="arrow-right" style="width:80px;height:48px;background:#1F6F76"></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FCFBF7;padding:40px;border:1px solid #E2DED3;border-radius:16px">
+<p style="font-size:26px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#1F6F76">Después (limpio)</p>
+<table style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:30px;color:#16202E">
+<tr><th style="width:12%">geo</th><th style="width:27%">country</th><th style="width:17%">year</th><th style="width:22%">value</th><th style="width:22%">flag</th></tr>
+<tr><td>BE</td><td>Belgium</td><td>2020</td><td>6.71</td><td>p</td></tr>
+</table>
+<p style="font-size:28px;line-height:1.35;color:#3D4654">Cada dato tiene su propia columna, y el número ya es un número.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1000px;font-size:24px;color:#5A626B">¿Qué es ETL?</p>
+<p style="position:absolute;left:1664px;bottom:64px;width:128px;font-size:24px;color:#5A626B;text-align:right">8</p>
+</section>
+<section id="dataframe" data-transition="fade" style="background:#F6F4EE;color:#16202E;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<p style="font-size:26px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B4432B">La estructura de datos</p>
+<h2 style="font-family:'EB Garamond', Georgia, serif;font-size:76px;font-weight:500;line-height:1.1;color:#16202E">Un DataFrame es una tabla con tipos y etiquetas</h2>
+<div style="display:flex;flex-direction:row;gap:64px;align-items:center">
+<div style="width:800px;display:flex;flex-direction:column;gap:16px">
+<table style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:32px;color:#16202E">
+<tr><th style="width:40%">country</th><th style="width:25%">year</th><th style="width:35%">value</th></tr>
+<tr><td>Denmark</td><td>2021</td><td>6.44</td></tr>
+<tr><td>Spain</td><td>2021</td><td>4.69</td></tr>
+<tr><td>Finland</td><td>2021</td><td>6.16</td></tr>
+</table>
+<p style="font-size:24px;color:#5A626B">Gasto público en educación, % del PIB</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px">
+<p style="font-size:32px;line-height:1.35"><b style="color:#1F6F76">Columnas:</b> cada una tiene un único tipo (texto, entero, decimal).</p>
+<p style="font-size:32px;line-height:1.35"><b style="color:#1F6F76">Filas:</b> cada una es una observación.</p>
+<p style="font-size:32px;line-height:1.35"><b style="color:#1F6F76">Etiquetas:</b> filas y columnas tienen nombre.</p>
+<p style="font-size:28px;line-height:1.35;color:#5A626B;font-style:italic">Como una matriz con nombres, o una hoja de cálculo estricta.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1000px;font-size:24px;color:#5A626B">¿Qué es ETL?</p>
+<p style="position:absolute;left:1664px;bottom:64px;width:128px;font-size:24px;color:#5A626B;text-align:right">9</p>
+</section>
+<section id="notebook" data-transition="fade" style="background:#16202E;color:#F6F4EE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<p style="font-size:26px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#F0937B">Cómo trabajaremos</p>
+<h2 style="font-family:'EB Garamond', Georgia, serif;font-size:76px;font-weight:500;line-height:1.1;color:#F6F4EE">Lee, ejecuta, prueba</h2>
+<div style="display:flex;flex-direction:row;gap:32px;align-items:center">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#1F2C3F;padding:40px;border:1px solid #33435C;border-radius:16px">
+<h3 style="font-size:40px;font-weight:600;color:#6CC3C9">Lee</h3>
+<p style="font-size:30px;line-height:1.35;color:#C5CEDA">Cada paso se explica antes de su código.</p>
+</div>
+<div class="arrow-right" style="width:80px;height:48px;background:#F0937B"></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#1F2C3F;padding:40px;border:1px solid #33435C;border-radius:16px">
+<h3 style="font-size:40px;font-weight:600;color:#6CC3C9">Ejecuta</h3>
+<p style="font-size:30px;line-height:1.35;color:#C5CEDA">Shift + Enter, en orden, desde arriba.</p>
+</div>
+<div class="arrow-right" style="width:80px;height:48px;background:#F0937B"></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#1F2C3F;padding:40px;border:1px solid #33435C;border-radius:16px">
+<h3 style="font-size:40px;font-weight:600;color:#6CC3C9">Prueba</h3>
+<p style="font-size:30px;line-height:1.35;color:#C5CEDA">Rellena los huecos de las celdas «Tu turno» y ejecuta la comprobación.</p>
+</div>
+</div>
+<p style="font-size:36px;line-height:1.3;font-style:italic;color:#F0937B">¿Un error en rojo? Lee la última línea.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1000px;font-size:24px;color:#8E9AAB">¿Qué es ETL?</p>
+<p style="position:absolute;left:1664px;bottom:64px;width:128px;font-size:24px;color:#8E9AAB;text-align:right">10</p>
+</section>
+<section id="plan" data-transition="fade" style="background:#F6F4EE;color:#16202E;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<p style="font-size:26px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B4432B">Plan de la sesión</p>
+<h2 style="font-family:'EB Garamond', Georgia, serif;font-size:76px;font-weight:500;line-height:1.1;color:#16202E">Dos horas, seis partes</h2>
+<table style="font-size:30px;color:#16202E">
+<tr><th style="width:20%;text-align:left">Tiempo</th><th style="width:25%;text-align:left">Parte</th><th style="width:55%;text-align:left">Qué hacemos</th></tr>
+<tr><td>0–15 min</td><td>Diapositivas e inicio</td><td>Concepto de ETL, abrir el notebook</td></tr>
+<tr><td>15–30 min</td><td>1 · DataFrames</td><td>pandas en diez minutos</td></tr>
+<tr><td>30–50 min</td><td>2 · Extract</td><td>Mirar los archivos, leer CSV y TSV</td></tr>
+<tr><td>50–90 min</td><td>3 · Transform</td><td>Limpiar, decidir, comprobar, cazar errores</td></tr>
+<tr><td>90–110 min</td><td>4 · Load</td><td>Guardar y hacer gráficos</td></tr>
+<tr><td>110–120 min</td><td>5 · Reflexión</td><td>Repaso y cierre</td></tr>
+</table>
+<p style="position:absolute;left:128px;bottom:64px;width:1000px;font-size:24px;color:#5A626B">¿Qué es ETL?</p>
+<p style="position:absolute;left:1664px;bottom:64px;width:128px;font-size:24px;color:#5A626B;text-align:right">11</p>
+</section>
+<section id="prediction" data-transition="fade" style="background:#16202E;color:#F6F4EE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<p style="font-size:26px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#F0937B">Antes de abrir nada</p>
+<h2 style="font-family:'EB Garamond', Georgia, serif;font-size:88px;font-weight:500;line-height:1.1;color:#F6F4EE">Escribe tu predicción</h2>
+<div style="display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:row;gap:32px;align-items:center">
+<p style="font-family:'EB Garamond', Georgia, serif;font-size:72px;line-height:1;color:#F0937B;width:80px">1</p>
+<p style="font-size:40px;line-height:1.3;color:#F6F4EE">¿Cuántos valores crees que faltan en el archivo?</p>
+</div>
+<div style="display:flex;flex-direction:row;gap:32px;align-items:center">
+<p style="font-family:'EB Garamond', Georgia, serif;font-size:72px;line-height:1;color:#F0937B;width:80px">2</p>
+<p style="font-size:40px;line-height:1.3;color:#F6F4EE">¿Qué país europeo gasta más en educación?</p>
+</div>
+<div style="display:flex;flex-direction:row;gap:32px;align-items:center">
+<p style="font-family:'EB Garamond', Georgia, serif;font-size:72px;line-height:1;color:#F0937B;width:80px">3</p>
+<p style="font-size:40px;line-height:1.3;color:#F6F4EE">¿Cómo crees que es el archivo original?</p>
+</div>
+</div>
+<p style="font-size:32px;line-height:1.3;font-style:italic;color:#6CC3C9">Escríbelo en una hoja de papel. Lo comprobaremos al final.</p>
+</section>
+</div>
+<div id="counter" title="flechas: avanzar"></div>
+<div id="notes"></div>
+<script>const HAS_NOTES = false; const NO_NOTES = "(sin notas)";
+const slides = [...document.querySelectorAll('.deck section')];
+const deck = document.querySelector('.deck');
+const notes = document.getElementById('notes');
+const counter = document.getElementById('counter');
+let i = Math.max(0, slides.findIndex(s => '#' + s.id === location.hash));
+
+function fit() {
+  const free = document.body.classList.contains('show-notes') ? window.innerHeight * 0.78 : window.innerHeight;
+  const scale = Math.min(window.innerWidth / 1920, free / 1080);
+  deck.style.top = (free / 2) + 'px';
+  deck.style.transform = 'translate(-50%, -50%) scale(' + scale + ')';
+}
+function show(n) {
+  i = Math.min(Math.max(n, 0), slides.length - 1);
+  slides.forEach((s, k) => s.classList.toggle('active', k === i));
+  const aside = slides[i].querySelector('aside');
+  notes.textContent = aside ? aside.textContent : NO_NOTES;
+  counter.textContent = (i + 1) + ' / ' + slides.length;
+  history.replaceState(null, '', '#' + slides[i].id);
+}
+document.addEventListener('keydown', e => {
+  if (['ArrowRight', 'ArrowDown', 'PageDown', ' '].includes(e.key)) show(i + 1);
+  else if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) show(i - 1);
+  else if (e.key === 'Home') show(0);
+  else if (e.key === 'End') show(slides.length - 1);
+  else if ((e.key === 'n' || e.key === 'N') && HAS_NOTES) { document.body.classList.toggle('show-notes'); fit(); }
+  else return;
+  e.preventDefault();
+});
+document.addEventListener('click', e => { if (!notes.contains(e.target)) show(e.clientX > window.innerWidth / 2 ? i + 1 : i - 1); });
+window.addEventListener('resize', fit);
+fit();
+show(i);
+</script>
+</body>
+</html>
