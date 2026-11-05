@@ -1,24 +1,20 @@
 [project]
-name = "session-05"
+name = "session-05-descriptive-statistics"
 version = "0.1.0"
-description = "Add your description here"
+description = "Descriptive Statistics"
 readme = "README.md"
-authors = [
-    { name = "petiaradeva", email = "radevap@gmail.com" }
-]
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 dependencies = [
-    "ipykernel",
-    "jupyterlab",
     "matplotlib",
     "numpy",
     "pandas",
     "scipy",
 ]
 
-[build-system]
-requires = ["uv_build>=0.13.1,<0.14.0"]
-build-backend = "uv_build"
+[dependency-groups]
+dev = [
+    "ipykernel>=6.29",
+]
 
 [tool.uv]
 package = false
