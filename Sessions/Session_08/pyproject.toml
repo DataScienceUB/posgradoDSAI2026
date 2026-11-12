@@ -1,0 +1,22 @@
+[project]
+name = "session-08-regression"
+version = "0.1.0"
+description = "Regresion analysis"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "matplotlib>=3.8",
+    "pandas>=2.2",
+    "seaborn",
+    "scipy",
+    "scikit-learn",
+]
+
+[dependency-groups]
+dev = [
+    "ipykernel>=6.29",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
