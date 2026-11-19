@@ -1,0 +1,24 @@
+[project]
+name = "causal-data-science"
+version = "0.1.0"
+description = "Materials and notebooks for causal data science"
+requires-python = ">=3.10"
+dependencies = [
+    "causal-learn",
+    "dowhy",
+    "ipykernel",
+    "ipython",
+    "jupyterlab",
+    "matplotlib",
+    "networkx",
+    "numpy",
+    "pandas",
+    "scikit-learn",
+    "scipy",
+]
+
+[tool.uv]
+package = false
+constraint-dependencies = [
+    "numba<0.63; sys_platform == 'darwin' and platform_machine == 'x86_64'",
+]
