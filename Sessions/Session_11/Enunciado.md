@@ -94,7 +94,7 @@ Como en el miniproyecto 1, **el código lo genera un agente de IA** y vuestro tr
 | CM3 | `reports/metricas.json` da el MAE y el RMSE del baseline y del modelo final en la partición de validación (tras `limpiar_objetivo()`), cada uno con su intervalo de confianza del 95 % por *bootstrap* |
 | CM4 | Entrenar dos veces da exactamente las mismas predicciones |
 | CM5 | El estimador final es lineal y `explicar(modelo, X)` devuelve el intercepto y la contribución de cada variable para cada fila de `X`: sumados, dan la predicción del modelo, en la escala en la que trabaja |
-| CM6 | `reports/experimentos.csv` tiene una fila por estrategia probada, con el MAE de cada una de las cinco particiones, su media y su desviación. Incluye como mínimo el baseline, el modelo mínimo, tres estrategias y una característica nueva |
+| CM6 | `reports/experimentos.csv` tiene una fila por estrategia probada, con el MAE de cada una de las cinco particiones, su media y su desviación. Incluye como mínimo el baseline, el modelo mínimo, 1 estrategia de limpieza, transformación y nueva característica y 4 estrategias de modelo |
 | CM7 | `limpiar_objetivo()` decide fila a fila: limpiar una parte de los datos da lo mismo que limpiarlos todos y quedarse con esa parte |
 
 Los criterios CA de vuestro `SPECS.md` van más allá. Por ejemplo, en la fase 2: "CA… (R…). '3ª planta', '3º' y 'Planta 3' se convierten en la planta 3"; o en la fase 4: "CA… (R…). Para la vivienda de ejemplo, la contribución de `habitaciones` calculada a mano coincide con la de `explicar()`".
